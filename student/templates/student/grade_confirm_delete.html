@@ -1,0 +1,31 @@
+{% extends 'student/base.html' %}
+
+{% block title %}Delete Grade - Student Management System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Delete Grade</h5>
+    </div>
+    <div class="card-body">
+        <p>Are you sure you want to delete the grade for "{{ object.student }}" in "{{ object.course }}"?</p>
+        <p>Grade Details:</p>
+        <ul>
+            <li>Grade: {{ object.grade }}</li>
+            <li>Type: {{ object.get_grade_type_display }}</li>
+            <li>Date: {{ object.date_recorded }}</li>
+        </ul>
+        <p>This action cannot be undone.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+            <a href="{% url 'student:dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %} 

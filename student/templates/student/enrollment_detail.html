@@ -1,0 +1,274 @@
+{% extends 'student/base.html' %}
+
+{% block title %}Enrollment Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+
+    .info-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .info-card .card-header {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .info-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .info-item {
+        margin-bottom: 1rem;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #6c757d;
+    }
+
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .table-card .card-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .table-card .table {
+        margin-bottom: 0;
+    }
+
+    .table-card .table th {
+        border-top: none;
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .table-card .table td {
+        vertical-align: middle;
+    }
+
+    .btn-action {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .semester-badge {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+        background: white;
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0.5rem 0;
+        color: #2c3e50;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Enrollment Details</h1>
+                <p>{{ enrollment.student.first_name }} {{ enrollment.student.last_name }} - {{ enrollment.course.name }}</p>
+            </div>
+            <div>
+                <a href="{% url 'student:enrollment_list' %}" class="btn btn-light btn-action mr-2">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+                <a href="{% url 'student:enrollment_edit' enrollment.id %}" class="btn btn-warning btn-action mr-2">
+                    <i class="fas fa-edit mr-2"></i>Edit
+                </a>
+                <a href="{% url 'student:enrollment_delete' enrollment.id %}" class="btn btn-danger btn-action">
+                    <i class="fas fa-trash mr-2"></i>Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Enrollment Information -->
+        <div class="col-md-4">
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle mr-2"></i>Enrollment Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <div class="info-label">Student</div>
+                        <div class="info-value">
+                            <a href="{% url 'student:student_detail' enrollment.student.id %}" class="text-decoration-none">
+                                {{ enrollment.student.first_name }} {{ enrollment.student.last_name }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Course</div>
+                        <div class="info-value">
+                            <a href="{% url 'student:course_detail' enrollment.course.id %}" class="text-decoration-none">
+                                {{ enrollment.course.name }} ({{ enrollment.course.code }})
+                            </a>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Semester</div>
+                        <div class="info-value">
+                            <span class="semester-badge">{{ enrollment.get_semester_display }}</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Enrollment Date</div>
+                        <div class="info-value">{{ enrollment.enrollment_date|date:"d M Y" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Created At</div>
+                        <div class="info-value">{{ enrollment.created_at|date:"d M Y H:i" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Last Updated</div>
+                        <div class="info-value">{{ enrollment.updated_at|date:"d M Y H:i" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grade Statistics -->
+            <div class="stat-card">
+                <i class="fas fa-chart-line stat-icon"></i>
+                <div class="stat-number">{{ average_grade|floatformat:1 }}</div>
+                <div class="stat-label">Average Grade</div>
+            </div>
+        </div>
+
+        <!-- Grades -->
+        <div class="col-md-8">
+            <div class="card table-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Course Grades</h5>
+                        <a href="{% url 'student:grade_add' %}?student={{ enrollment.student.id }}&course={{ enrollment.course.id }}" class="btn btn-light btn-action">
+                            <i class="fas fa-plus mr-2"></i>Add Grade
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr>
+                                    <td>{{ grade.grade }}</td>
+                                    <td>{{ grade.get_grade_type_display }}</td>
+                                    <td>{{ grade.date_recorded|date:"d M Y" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'student:grade_edit' grade.id %}" class="btn btn-sm btn-warning btn-action">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'student:grade_delete' grade.id %}" class="btn btn-sm btn-danger btn-action">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">No grades found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

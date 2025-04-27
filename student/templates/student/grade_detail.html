@@ -1,0 +1,265 @@
+{% extends 'student/base.html' %}
+
+{% block title %}Grade Details - Student Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+
+    .info-card {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .info-card .card-header {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .info-card .card-body {
+        padding: 2rem;
+    }
+
+    .info-item {
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        color: #2c3e50;
+        font-size: 1.25rem;
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .badge-success {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+    }
+
+    .badge-warning {
+        background: linear-gradient(45deg, #f1c40f, #f39c12);
+        color: white;
+    }
+
+    .badge-danger {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+    }
+
+    .btn-action {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+        background: linear-gradient(45deg, #f1c40f, #f39c12);
+        color: white;
+        border: none;
+    }
+
+    .btn-delete {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+        border: none;
+    }
+
+    .stats-card {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stats-value {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-label {
+        color: #7f8c8d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Grade Details</h1>
+                <p>Detailed information about the grade record</p>
+            </div>
+            <div>
+                <a href="{% url 'student:grade_list' %}" class="btn btn-light btn-action">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Grade Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <div class="info-label">Student</div>
+                                <div class="info-value">{{ grade.student.first_name }} {{ grade.student.last_name }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Student ID</div>
+                                <div class="info-value">{{ grade.student.student_id }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <div class="info-label">Course</div>
+                                <div class="info-value">{{ grade.course.name }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Grade Type</div>
+                                <div class="info-value">{{ grade.get_grade_type_display }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <div class="info-label">Grade</div>
+                                <div class="info-value">
+                                    {{ grade.grade }}
+                                    {% if grade.grade_type == 'L' %}
+                                        <span class="badge badge-success ml-2">{{ grade.letter_grade }}</span>
+                                    {% else %}
+                                        {% if grade.grade >= 60 %}
+                                            <span class="badge badge-success ml-2">Pass</span>
+                                        {% else %}
+                                            <span class="badge badge-danger ml-2">Fail</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <div class="info-label">Date Recorded</div>
+                                <div class="info-value">{{ grade.date_recorded|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Makeup Grade</div>
+                                <div class="info-value">
+                                    {% if grade.is_makeup %}
+                                        <span class="badge badge-warning">Yes</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">No</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if grade.notes %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="info-item">
+                                <div class="info-label">Notes</div>
+                                <div class="info-value">{{ grade.notes }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{% url 'student:grade_edit' grade.id %}" class="btn btn-edit btn-action mr-2">
+                            <i class="fas fa-edit mr-2"></i>Edit Grade
+                        </a>
+                        <a href="{% url 'student:grade_delete' grade.id %}" class="btn btn-delete btn-action">
+                            <i class="fas fa-trash mr-2"></i>Delete Grade
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-value">{{ student_average|floatformat:1 }}</div>
+                        <div class="stats-label">Student's Course Average</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="stats-card">
+                        <div class="stats-value">{{ course_average|floatformat:1 }}</div>
+                        <div class="stats-label">Course Average</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

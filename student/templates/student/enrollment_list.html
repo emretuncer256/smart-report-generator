@@ -1,0 +1,248 @@
+{% extends 'student/base.html' %}
+
+{% block title %}Enrollments - Student Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+
+    .action-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .action-card .card-header {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .action-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .search-box {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .table-card .card-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .table-card .table {
+        margin-bottom: 0;
+    }
+
+    .table-card .table th {
+        border-top: none;
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .table-card .table td {
+        vertical-align: middle;
+    }
+
+    .btn-action {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .pagination {
+        margin: 1rem 0 0;
+        justify-content: center;
+    }
+
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 0.25rem;
+        border: none;
+        background: #f8f9fa;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+    }
+
+    .semester-badge {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .enrollment-date {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <h1><i class="fas fa-user-plus mr-2"></i>Enrollments</h1>
+        <p>Manage and view all course enrollments</p>
+    </div>
+
+    <!-- Search and Add Enrollment Card -->
+    <div class="card action-card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-search mr-2"></i>Search Enrollments</h5>
+                <a href="{% url 'student:enrollment_add' %}" class="btn btn-light btn-action">
+                    <i class="fas fa-plus mr-2"></i>Add New Enrollment
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="get" class="mb-0">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control search-box" placeholder="Search by student name or course..." value="{{ request.GET.q }}">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary btn-action">
+                            <i class="fas fa-search mr-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enrollments Table Card -->
+    <div class="card table-card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list mr-2"></i>Enrollment List</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Semester</th>
+                            <th>Enrollment Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in enrollments %}
+                        <tr>
+                            <td>{{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</td>
+                            <td>{{ enrollment.course.name }}</td>
+                            <td><span class="semester-badge">{{ enrollment.get_semester_display }}</span></td>
+                            <td><span class="enrollment-date">{{ enrollment.enrollment_date|date:"d M Y" }}</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'student:enrollment_detail' enrollment.id %}" class="btn btn-sm btn-info btn-action">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'student:enrollment_edit' enrollment.id %}" class="btn btn-sm btn-warning btn-action">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'student:enrollment_delete' enrollment.id %}" class="btn btn-sm btn-danger btn-action">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">No enrollments found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                    {{ num }}
+                </a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

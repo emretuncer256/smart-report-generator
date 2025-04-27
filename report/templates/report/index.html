@@ -1,0 +1,177 @@
+{% extends 'student/base.html' %}
+
+{% block title %}Report Generation{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+
+    .report-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .report-card .card-header {
+        padding: 1.5rem;
+        border: none;
+        background: linear-gradient(45deg, var(--start-color), var(--end-color));
+        color: white;
+    }
+
+    .report-card .card-header h5 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .report-card .card-header i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+
+    .report-card .card-body {
+        padding: 1.5rem;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .report-card .card-text {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+    }
+
+    .report-card .btn {
+        width: 100%;
+        padding: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 8px;
+        margin-top: auto;
+    }
+
+    .student-report {
+        --start-color: #2193b0;
+        --end-color: #6dd5ed;
+    }
+
+    .course-report {
+        --start-color: #ee0979;
+        --end-color: #ff6a00;
+    }
+
+    .grade-report {
+        --start-color: #11998e;
+        --end-color: #38ef7d;
+    }
+
+    .stats-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 4rem;
+        opacity: 0.1;
+        color: white;
+    }
+
+    .page-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <h1><i class="fas fa-chart-line mr-2"></i>Report Generation</h1>
+        <p>Generate comprehensive reports for students, courses, and grades</p>
+    </div>
+
+    <div class="row">
+        <!-- Student Report Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card report-card student-report">
+                <div class="card-header text-center position-relative">
+                    <i class="fas fa-user-graduate d-block"></i>
+                    <h5>Student Report</h5>
+                    <i class="fas fa-chart-pie stats-icon"></i>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Generate comprehensive student statistics including gender distribution and performance metrics.</p>
+                    <a href="{% url 'report:student_report' %}" class="btn btn-primary">
+                        <i class="fas fa-file-alt mr-2"></i>Generate Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Report Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card report-card course-report">
+                <div class="card-header text-center position-relative">
+                    <i class="fas fa-book d-block"></i>
+                    <h5>Course Report</h5>
+                    <i class="fas fa-chart-bar stats-icon"></i>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Analyze course statistics with enrollment trends and performance indicators.</p>
+                    <a href="{% url 'report:course_report' %}" class="btn btn-primary">
+                        <i class="fas fa-file-alt mr-2"></i>Generate Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grade Report Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card report-card grade-report">
+                <div class="card-header text-center position-relative">
+                    <i class="fas fa-graduation-cap d-block"></i>
+                    <h5>Grade Report</h5>
+                    <i class="fas fa-chart-line stats-icon"></i>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">View detailed grade distributions and performance analytics across courses.</p>
+                    <a href="{% url 'report:grade_report' %}" class="btn btn-primary">
+                        <i class="fas fa-file-alt mr-2"></i>Generate Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generated Reports Link -->
+    <div class="text-center mt-4">
+        <a href="{% url 'report:report_list' %}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-list mr-2"></i>View Generated Reports
+        </a>
+    </div>
+</div>
+{% endblock %} 

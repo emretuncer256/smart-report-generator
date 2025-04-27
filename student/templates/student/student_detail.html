@@ -1,0 +1,292 @@
+{% extends 'student/base.html' %}
+
+{% block title %}{{ student.first_name }} {{ student.last_name }} - Student Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+
+    .info-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .info-card .card-header {
+        background: linear-gradient(45deg, #2193b0, #6dd5ed);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .info-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .info-item {
+        margin-bottom: 1rem;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #6c757d;
+    }
+
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .table-card .card-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .table-card .table {
+        margin-bottom: 0;
+    }
+
+    .table-card .table th {
+        border-top: none;
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .table-card .table td {
+        vertical-align: middle;
+    }
+
+    .btn-action {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .student-picture {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>{{ student.first_name }} {{ student.last_name }}</h1>
+                <p>Student Details</p>
+            </div>
+            <div>
+                <a href="{% url 'student:student_list' %}" class="btn btn-light btn-action mr-2">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+                <a href="{% url 'student:student_edit' student.id %}" class="btn btn-warning btn-action mr-2">
+                    <i class="fas fa-edit mr-2"></i>Edit
+                </a>
+                <a href="{% url 'student:student_delete' student.id %}" class="btn btn-danger btn-action">
+                    <i class="fas fa-trash mr-2"></i>Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Personal Information -->
+        <div class="col-md-4">
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Personal Information</h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ student.picture.url }}" alt="{{ student.first_name }}" class="student-picture">
+                    <div class="info-item">
+                        <div class="info-label">Student ID</div>
+                        <div class="info-value">{{ student.student_id }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">{{ student.email }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Gender</div>
+                        <div class="info-value">{{ student.get_gender_display }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Date of Birth</div>
+                        <div class="info-value">{{ student.birth_date|date:"d M Y" }}</div>
+                    </div>
+                    {% if student.phone %}
+                    <div class="info-item">
+                        <div class="info-label">Phone</div>
+                        <div class="info-value">{{ student.phone }}</div>
+                    </div>
+                    {% endif %}
+                    {% if student.address %}
+                    <div class="info-item">
+                        <div class="info-label">Address</div>
+                        <div class="info-value">{{ student.address }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Enrollments -->
+        <div class="col-md-8">
+            <div class="card table-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-book mr-2"></i>Course Enrollments</h5>
+                        <a href="{% url 'student:enrollment_add' %}?student={{ student.id }}" class="btn btn-light btn-action">
+                            <i class="fas fa-plus mr-2"></i>Add Enrollment
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Semester</th>
+                                    <th>Enrollment Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enrollment in enrollments %}
+                                <tr>
+                                    <td>{{ enrollment.course.name }}</td>
+                                    <td>{{ enrollment.get_semester_display }}</td>
+                                    <td>{{ enrollment.enrollment_date|date:"d M Y" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'student:enrollment_detail' enrollment.id %}" class="btn btn-sm btn-info btn-action">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'student:enrollment_delete' enrollment.id %}" class="btn btn-sm btn-danger btn-action">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">No enrollments found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grades -->
+            <div class="card table-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Grades</h5>
+                        <a href="{% url 'student:grade_add' %}?student={{ student.id }}" class="btn btn-light btn-action">
+                            <i class="fas fa-plus mr-2"></i>Add Grade
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Grade</th>
+                                    <th>Letter Grade</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr>
+                                    <td>{{ grade.course.name }}</td>
+                                    <td>{{ grade.grade }}</td>
+                                    <td>
+                                        {% if grade.grade_type == 'L' %}
+                                            {{ grade.letter_grade }}
+                                        {% else %}
+                                            {% if grade.grade >= 60 %}
+                                                <span class="badge bg-success">Pass</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Fail</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ grade.get_grade_type_display }}</td>
+                                    <td>{{ grade.date_recorded|date:"d M Y" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'student:grade_edit' grade.id %}" class="btn btn-sm btn-warning btn-action">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'student:grade_delete' grade.id %}" class="btn btn-sm btn-danger btn-action">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">No grades found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

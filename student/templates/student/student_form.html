@@ -1,0 +1,461 @@
+{% extends 'student/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Student{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+
+    .form-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        background: white;
+    }
+
+    .form-card .card-header {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .form-card .card-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .btn-action {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-submit {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        border: none;
+        color: white;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(45deg, #0e8a7e, #32d56d);
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .form-section-title {
+        color: #2c3e50;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .custom-file-label {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        height: auto;
+        line-height: 1.5;
+    }
+
+    .custom-file-label::after {
+        height: 100%;
+        padding: 0.75rem 1rem;
+        background: #f8f9fa;
+        color: #2c3e50;
+    }
+
+    .gender-options {
+        display: flex;
+        gap: 2rem;
+        padding: 0.5rem 0;
+    }
+
+    .gender-option {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .gender-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .gender-option input[type="radio"] {
+        width: 1.2em;
+        height: 1.2em;
+        margin-right: 0.75rem;
+        cursor: pointer;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+
+    .gender-option input[type="radio"]:checked {
+        border-color: #3498db;
+        background-color: #3498db;
+    }
+
+    .gender-option label {
+        margin-bottom: 0;
+        cursor: pointer;
+        font-weight: 500;
+        color: #2c3e50;
+        user-select: none;
+    }
+
+    .gender-option input[type="radio"]:checked + label {
+        color: #3498db;
+    }
+
+    .profile-picture-container {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .profile-picture {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+
+    .picture-upload-container {
+        background: #f8f9fa;
+        border: 2px dashed #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .picture-upload-container:hover {
+        border-color: #3498db;
+        background: #f1f9ff;
+    }
+
+    .picture-upload-icon {
+        font-size: 2rem;
+        color: #3498db;
+        margin-bottom: 0.5rem;
+    }
+
+    .picture-upload-text {
+        color: #6c757d;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .custom-file {
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Student</h1>
+                <p>{% if form.instance.pk %}Update existing{% else %}Create new{% endif %} student record</p>
+            </div>
+            <div>
+                <a href="{% url 'student:student_list' %}" class="btn btn-light btn-action">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-graduate mr-2"></i>Student Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">Personal Information</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.first_name.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.last_name.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label d-block">Gender</label>
+                                    <div class="gender-options">
+                                        <div class="gender-option">
+                                            <input type="radio" name="{{ form.gender.name }}" value="M" 
+                                                   id="gender_male" {% if form.gender.value == 'M' %}checked{% endif %}>
+                                            <label for="gender_male">Male</label>
+                                        </div>
+                                        <div class="gender-option">
+                                            <input type="radio" name="{{ form.gender.name }}" value="F" 
+                                                   id="gender_female" {% if form.gender.value == 'F' %}checked{% endif %}>
+                                            <label for="gender_female">Female</label>
+                                        </div>
+                                    </div>
+                                    {% if form.gender.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.gender.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.birth_date.id_for_label }}" class="form-label">Date of Birth</label>
+                                    {{ form.birth_date }}
+                                    {% if form.birth_date.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.birth_date.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Profile Picture</label>
+                                <div class="profile-picture-container">
+                                    {% if form.instance.picture %}
+                                        <img src="{{ form.instance.picture.url }}" alt="Current profile picture" class="profile-picture">
+                                    {% else %}
+                                        <img src="/media/student/default.png" alt="Default profile picture" class="profile-picture">
+                                    {% endif %}
+                                </div>
+                                <div class="picture-upload-container">
+                                    <div class="picture-upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="picture-upload-text">
+                                        Click or drag to upload a new profile picture
+                                    </div>
+                                    <div class="custom-file">
+                                        {{ form.picture }}
+                                        <label class="custom-file-label" for="{{ form.picture.id_for_label }}">Choose file</label>
+                                    </div>
+                                </div>
+                                {% if form.picture.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.picture.errors|join:", " }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">Contact Information</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.student_id.id_for_label }}" class="form-label">Student ID</label>
+                                    {{ form.student_id }}
+                                    {% if form.student_id.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.student_id.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Phone Number</label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.phone.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.email.errors|join:", " }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.address.errors|join:", " }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-submit btn-action">
+                                <i class="fas fa-save mr-2"></i>{% if form.instance.pk %}Update{% else %}Create{% endif %} Student
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // File input and preview functionality
+    var fileInput = document.querySelector('input[type="file"]');
+    var previewImage = document.querySelector('.profile-picture');
+    var fileLabel = document.querySelector('.custom-file-label');
+
+    if (fileInput) {
+        fileInput.classList.add('custom-file-input');
+        
+        fileInput.addEventListener('change', function(e) {
+            // Update file name label
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file';
+            fileLabel.textContent = fileName;
+
+            // Update image preview
+            if (e.target.files && e.target.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    }
+
+    // Drag and drop functionality
+    var uploadContainer = document.querySelector('.picture-upload-container');
+
+    if (uploadContainer && fileInput) {
+        ['dragenter', 'dragover'].forEach(function(eventName) {
+            uploadContainer.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.borderColor = '#3498db';
+                this.style.background = '#f1f9ff';
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(function(eventName) {
+            uploadContainer.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.borderColor = '#e0e0e0';
+                this.style.background = '#f8f9fa';
+            });
+        });
+
+        uploadContainer.addEventListener('drop', function(e) {
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                var event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+    }
+
+    // Date picker initialization
+    $(document).ready(function() {
+        $('#{{ form.birth_date.id_for_label }}').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,362 @@
+{% extends 'student/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Grade - Student Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+
+    .form-card {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .form-card .card-header {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .form-card .card-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        height: 45px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .btn-action {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-submit {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        border: none;
+        color: white;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(45deg, #0e8a7e, #32d56d);
+    }
+
+    .btn-cancel {
+        background: #e0e0e0;
+        border: none;
+        color: #2c3e50;
+    }
+
+    .btn-cancel:hover {
+        background: #d5d5d5;
+        color: #2c3e50;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .form-section-title {
+        color: #2c3e50;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .select2-container--default .select2-selection--single {
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        height: 45px !important;
+        padding: 0.75rem 1rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: normal;
+        padding: 0;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%;
+        top: 0;
+        right: 10px;
+    }
+
+    .select2-dropdown {
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+    }
+
+    .grade-input {
+        font-size: 1.25rem;
+        text-align: center;
+        font-weight: 600;
+        height: 45px;
+    }
+
+    .grade-input::-webkit-inner-spin-button,
+    .grade-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .grade-input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+    }
+
+    .alert-danger {
+        background: linear-gradient(45deg, #ff7675, #d63031);
+        color: white;
+    }
+
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.2em;
+    }
+
+    .form-check-label {
+        margin-left: 0.5rem;
+        font-weight: 500;
+    }
+
+    textarea.form-control {
+        height: auto;
+        min-height: 100px;
+        resize: vertical;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Grade</h1>
+                <p>{% if form.instance.pk %}Update existing{% else %}Record new{% endif %} grade for student</p>
+            </div>
+            <div>
+                <a href="{% url 'student:grade_list' %}" class="btn btn-light btn-action">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Grade Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger mb-4">
+                            {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Student and Course Selection -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">Student and Course Information</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.student.id_for_label }}" class="form-label">Student</label>
+                                    {{ form.student }}
+                                    {% if form.student.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.student.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.course.id_for_label }}" class="form-label">Course</label>
+                                    {{ form.course }}
+                                    {% if form.course.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.course.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grade Details -->
+                        <div class="form-section">
+                            <h6 class="form-section-title">Grade Details</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.grade_type.id_for_label }}" class="form-label">Grade Type</label>
+                                    {{ form.grade_type }}
+                                    {% if form.grade_type.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.grade_type.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.grade.id_for_label }}" class="form-label">Grade</label>
+                                    {{ form.grade }}
+                                    {% if form.grade.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.grade.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.letter_grade.id_for_label }}" class="form-label">Letter Grade</label>
+                                    {{ form.letter_grade }}
+                                    {% if form.letter_grade.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.letter_grade.errors|join:", " }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check">
+                                        {{ form.is_makeup }}
+                                        <label class="form-check-label" for="{{ form.is_makeup.id_for_label }}">
+                                            Makeup Grade
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                                {{ form.notes }}
+                                {% if form.notes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.notes.errors|join:", " }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'student:grade_list' %}" class="btn btn-cancel btn-action mr-2">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-submit btn-action">
+                                <i class="fas fa-save mr-2"></i>Save Grade
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize Select2
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            width: '100%'
+        });
+
+        // Handle grade input change
+        $('#{{ form.grade.id_for_label }}').on('input', function() {
+            var grade = parseFloat($(this).val());
+            var letterGradeSelect = $('#{{ form.letter_grade.id_for_label }}');
+            
+            if (!isNaN(grade)) {
+                var letterGrade;
+                if (grade >= 90) letterGrade = 'AA';
+                else if (grade >= 80) letterGrade = 'BA';
+                else if (grade >= 73) letterGrade = 'BB';
+                else if (grade >= 66) letterGrade = 'CB';
+                else if (grade >= 60) letterGrade = 'CC';
+                else letterGrade = 'FF';
+                
+                letterGradeSelect.val(letterGrade);
+            }
+        });
+    });
+</script>
+{% endblock %} 

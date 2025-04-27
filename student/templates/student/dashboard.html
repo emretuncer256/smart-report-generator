@@ -1,0 +1,250 @@
+{% extends 'student/base.html' %}
+
+{% block title %}Dashboard - Student Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .dashboard-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+
+    .stat-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .stat-card .card-body {
+        padding: 1.5rem;
+        background: white;
+        text-align: center;
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(45deg, var(--start-color), var(--end-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0.5rem 0;
+        color: #2c3e50;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .students-stat {
+        --start-color: #2193b0;
+        --end-color: #6dd5ed;
+    }
+
+    .courses-stat {
+        --start-color: #ee0979;
+        --end-color: #ff6a00;
+    }
+
+    .enrollments-stat {
+        --start-color: #11998e;
+        --end-color: #38ef7d;
+    }
+
+    .grades-stat {
+        --start-color: #8e2de2;
+        --end-color: #4a00e0;
+    }
+
+    .chart-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .chart-card .card-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .chart-card .card-header h5 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .chart-card .card-body {
+        padding: 1.5rem;
+        height: 300px; /* Fixed height for chart container */
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gender Distribution Chart
+    var genderCtx = document.getElementById('genderChart').getContext('2d');
+    var genderChart = new Chart(genderCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [{{ gender_distribution.male }}, {{ gender_distribution.female }}],
+                backgroundColor: ['#4a90e2', '#e35183'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: 'bottom'
+            }
+        }
+    });
+
+    // Course Distribution Chart
+    var courseCtx = document.getElementById('courseChart').getContext('2d');
+    var courseChart = new Chart(courseCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for course in course_statistics %}'{{ course.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Students Enrolled',
+                data: [{% for course in course_statistics %}{{ course.student_count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: '#3498db',
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            legend: {
+                display: false
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</h1>
+        <p>Overview of the student management system</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card students-stat">
+                <div class="card-body">
+                    <i class="fas fa-user-graduate stat-icon"></i>
+                    <div class="stat-number">{{ total_students }}</div>
+                    <div class="stat-label">Students</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card courses-stat">
+                <div class="card-body">
+                    <i class="fas fa-book stat-icon"></i>
+                    <div class="stat-number">{{ total_courses }}</div>
+                    <div class="stat-label">Courses</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card enrollments-stat">
+                <div class="card-body">
+                    <i class="fas fa-user-plus stat-icon"></i>
+                    <div class="stat-number">{{ total_enrollments }}</div>
+                    <div class="stat-label">Enrollments</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card grades-stat">
+                <div class="card-body">
+                    <i class="fas fa-graduation-cap stat-icon"></i>
+                    <div class="stat-number">{{ total_grades }}</div>
+                    <div class="stat-label">Grades</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <!-- Gender Distribution Chart -->
+        <div class="col-md-6">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie mr-2"></i>Gender Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Distribution Chart -->
+        <div class="col-md-6">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar mr-2"></i>Course Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="courseChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
