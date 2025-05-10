@@ -1,0 +1,187 @@
+{% extends 'student/base.html' %}
+{% load static %}
+
+{% block title %}Bulk Grade Entry - {{ course.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.8;
+    }
+
+    .grade-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .grade-card .card-header {
+        background: linear-gradient(45deg, #ee0979, #ff6a00);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .grade-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-top: none;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 1rem;
+    }
+
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #2c3e50, #3498db);
+        border: none;
+        padding: 0.8rem;
+        font-weight: 500;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #3498db, #2c3e50);
+    }
+
+    .btn-secondary {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #2c3e50;
+        padding: 0.8rem;
+        font-weight: 500;
+    }
+
+    .btn-secondary:hover {
+        background: #e9ecef;
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Bulk Grade Entry</h1>
+                <p>{{ course.name }} - {{ course.code }}</p>
+            </div>
+            <div>
+                <a href="{% url 'student:course_detail' course.id %}" class="btn btn-light btn-action">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Course
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card grade-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Enter Grades</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Student Name</th>
+                                        <th>Grade Type</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for enrollment in enrollments %}
+                                    <tr>
+                                        <td>{{ enrollment.student.student_id }}</td>
+                                        <td>{{ enrollment.student.get_full_name }}</td>
+                                        <td>
+                                            <select name="type_{{ enrollment.student.id }}" class="form-control" required>
+                                                <option value="">Select Type</option>
+                                                {% for type_code, type_name in grade_types %}
+                                                <option value="{{ type_code }}">{{ type_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" 
+                                                   name="grade_{{ enrollment.student.id }}" 
+                                                   class="form-control" 
+                                                   min="0" 
+                                                   max="100" 
+                                                   step="0.1" 
+                                                   placeholder="Enter grade"
+                                                   required>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">No students enrolled in this course.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% if enrollments %}
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>Save All Grades
+                            </button>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,20 +1,20 @@
 {% extends 'student/base.html' %}
 
-{% block title %}Delete Student - Student Management System{% endblock %}
+{% block title %}Deactivate Student - Student Management System{% endblock %}
 
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h5 class="card-title mb-0">Delete Student</h5>
+        <h5 class="card-title mb-0">Deactivate Student</h5>
     </div>
     <div class="card-body">
-        <p>Are you sure you want to delete the student "{{ object.first_name }} {{ object.last_name }}"?</p>
-        <p>This action cannot be undone.</p>
+        <p>Are you sure you want to deactivate the student "{{ object.first_name }} {{ object.last_name }}"?</p>
+        <p>This will hide the student from the active students list, but their data will be preserved in the system.</p>
 
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Delete
+            <button type="submit" class="btn btn-warning">
+                <i class="fas fa-user-slash"></i> Deactivate
             </button>
             <a href="{% url 'student:student_list' %}" class="btn btn-secondary">
                 <i class="fas fa-times"></i> Cancel

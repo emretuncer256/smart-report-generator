@@ -16,8 +16,12 @@ class Student(models.Model):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True, help_text="Designates whether this student is active or not.")
 
     def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+
+    def get_full_name(self):
         return f'{self.first_name} {self.last_name}'
 
     def get_course_grades(self, course):
@@ -159,14 +163,14 @@ class Grade(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     grade = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
-    grade_type = models.CharField(max_length=1, choices=GRADE_TYPE_CHOICES, default='L')
+    grade_type = models.CharField(max_length=1, choices=GRADE_TYPE_CHOICES, default='M')
     letter_grade = models.CharField(max_length=2, choices=LETTER_GRADE_CHOICES, null=True, blank=True)
     is_makeup = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
     date_recorded = models.DateField(auto_now_add=True)
 
     class Meta:
-        unique_together = ['student', 'course']
+        unique_together = ['student', 'course', 'grade_type']
 
     def __str__(self):
         if self.grade_type == 'P':
@@ -188,7 +192,7 @@ class Grade(models.Model):
         return grade_mapping.get(self.letter_grade, 0.0)
 
     def save(self, *args, **kwargs):
-        if self.grade_type == 'L':
+        if self.grade_type != 'P':  # Project dışındaki tüm not tipleri için harf notu ata
             if 90 <= self.grade <= 100:
                 self.letter_grade = 'AA'
             elif 80 <= self.grade <= 89:

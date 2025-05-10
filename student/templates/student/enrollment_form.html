@@ -1,6 +1,7 @@
 {% extends 'student/base.html' %}
+{% load static %}
 
-{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Enrollment{% endblock %}
+{% block title %}Enroll Student{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -144,97 +145,201 @@
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
         background: linear-gradient(45deg, #11998e, #38ef7d);
     }
+
+    .form-check {
+        margin-bottom: 0.5rem;
+    }
+    .form-check-input {
+        margin-top: 0.3rem;
+    }
+    .form-check-label {
+        margin-left: 0.5rem;
+    }
+
+    .course-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .course-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .course-card:hover {
+        border-color: #3498db;
+        background-color: #f8f9fa;
+    }
+
+    .course-card.selected {
+        border-color: #11998e;
+        background-color: #f8f9fa;
+    }
+
+    .course-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .course-checkbox input[type="checkbox"] {
+        margin: 0;
+    }
+
+    .course-name {
+        font-size: 0.95rem;
+        color: #2c3e50;
+    }
+
+    .course-section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .course-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .no-courses-message {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        text-align: center;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .loading-spinner.active {
+        display: block;
+    }
+
+    .course-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .course-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .course-card.selected {
+        border-color: #007bff;
+        background-color: #f8f9fa;
+    }
+    .select2-container {
+        width: 100% !important;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Enrollment</h1>
-                <p>{% if form.instance.pk %}Update existing{% else %}Create new{% endif %} enrollment record</p>
-            </div>
-            <div>
-                <a href="{% url 'student:enrollment_list' %}" class="btn btn-light btn-action">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to List
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="form-card">
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-user-plus mr-2"></i>Enrollment Information</h5>
+                    <h4 class="mb-0">Enroll Student in Courses</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" novalidate>
+                    <form method="post" id="enrollmentForm">
                         {% csrf_token %}
                         
-                        <!-- Student and Course Selection -->
-                        <div class="form-section">
-                            <h6 class="form-section-title">Student and Course Selection</h6>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.student.id_for_label }}" class="form-label">Student</label>
-                                    {{ form.student }}
-                                    {% if form.student.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.student.errors|join:", " }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.course.id_for_label }}" class="form-label">Course</label>
-                                    {{ form.course }}
-                                    {% if form.course.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.course.errors|join:", " }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Enrollment Details -->
-                        <div class="form-section">
-                            <h6 class="form-section-title">Enrollment Details</h6>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.semester.id_for_label }}" class="form-label">Semester</label>
-                                    {{ form.semester }}
-                                    {% if form.semester.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.semester.errors|join:", " }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.enrollment_date.id_for_label }}" class="form-label">Enrollment Date</label>
-                                    {{ form.enrollment_date }}
-                                    {% if form.enrollment_date.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.enrollment_date.errors|join:", " }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
                         {% if form.non_field_errors %}
-                        <div class="alert alert-danger mb-4">
+                        <div class="alert alert-danger">
                             {% for error in form.non_field_errors %}
-                            <p class="mb-0">{{ error }}</p>
+                                {{ error }}
                             {% endfor %}
                         </div>
                         {% endif %}
 
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-submit btn-action">
-                                <i class="fas fa-save mr-2"></i>{% if form.instance.pk %}Update{% else %}Create{% endif %} Enrollment
-                            </button>
+                        <div class="form-group">
+                            <label for="{{ form.student.id_for_label }}">Student</label>
+                            {{ form.student }}
+                            {% if form.student.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.student.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.semester.id_for_label }}">Semester</label>
+                            {{ form.semester }}
+                            {% if form.semester.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.semester.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.enrollment_date.id_for_label }}">Enrollment Date</label>
+                            {{ form.enrollment_date }}
+                            {% if form.enrollment_date.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.enrollment_date.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label>Available Courses</label>
+                            <div id="coursesContainer">
+                                {% if form.courses.field.queryset %}
+                                    <div class="row">
+                                        {% for course in form.courses.field.queryset %}
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card course-card">
+                                                <div class="card-body">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" 
+                                                               class="custom-control-input" 
+                                                               name="courses" 
+                                                               value="{{ course.id }}"
+                                                               id="course_{{ course.id }}">
+                                                        <label class="custom-control-label" for="course_{{ course.id }}">
+                                                            {{ course.name }}
+                                                        </label>
+                                                    </div>
+                                                    <small class="text-muted d-block mt-2">
+                                                        Code: {{ course.code }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        No courses available for enrollment.
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% if form.courses.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.courses.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Enroll</button>
+                            <a href="{% url 'student:enrollment_list' %}" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>
@@ -242,23 +347,45 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
-        // Initialize Select2 for student and course dropdowns
-        $('#{{ form.student.id_for_label }}, #{{ form.course.id_for_label }}').select2({
-            theme: 'default',
-            width: '100%'
-        });
-
-        // Initialize datepicker for enrollment date
-        $('#{{ form.enrollment_date.id_for_label }}').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true
-        });
+$(document).ready(function() {
+    // Initialize Select2 for student dropdown
+    $('#id_student').select2({
+        placeholder: 'Select a student',
+        allowClear: true
     });
+
+    // Initialize datepicker
+    $('#id_enrollment_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    // Handle student selection change
+    $('#id_student').on('select2:select', function(e) {
+        var studentId = e.params.data.id;
+        if (studentId) {
+            window.location.href = "{% url 'student:enrollment_add' %}?student=" + studentId;
+        }
+    });
+
+    // Handle course card selection
+    $('.course-card').click(function(e) {
+        if (!$(e.target).is('input')) {
+            var checkbox = $(this).find('input[type="checkbox"]');
+            checkbox.prop('checked', !checkbox.prop('checked'));
+            $(this).toggleClass('selected', checkbox.prop('checked'));
+        }
+    });
+
+    // Update card style when checkbox is clicked
+    $('input[type="checkbox"]').change(function() {
+        $(this).closest('.course-card').toggleClass('selected', this.checked);
+    });
+});
 </script>
-{% endblock %}
 {% endblock %} 

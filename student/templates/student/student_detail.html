@@ -108,6 +108,31 @@
         margin-bottom: 1rem;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
+
+    .badge-AA {
+        background: linear-gradient(45deg, #43e97b, #38f9d7);
+        color: white;
+    }
+    .badge-BA {
+        background: linear-gradient(45deg, #a8ff78, #78ffd6);
+        color: #1a3c1a;
+    }
+    .badge-BB {
+        background: linear-gradient(45deg, #56ccf2, #2f80ed);
+        color: white;
+    }
+    .badge-CB {
+        background: linear-gradient(45deg, #f7971e, #ffd200);
+        color: #7a4a00;
+    }
+    .badge-CC {
+        background: linear-gradient(45deg, #ffe259, #ffa751);
+        color: #7a4a00;
+    }
+    .badge-FF {
+        background: linear-gradient(45deg, #ff5858, #f857a6);
+        color: white;
+    }
 </style>
 {% endblock %}
 
@@ -253,13 +278,13 @@
                                     <td>{{ grade.course.name }}</td>
                                     <td>{{ grade.grade }}</td>
                                     <td>
-                                        {% if grade.grade_type == 'L' %}
-                                            {{ grade.letter_grade }}
+                                        {% if grade.letter_grade %}
+                                            <span class="badge badge-{{ grade.letter_grade }}">{{ grade.letter_grade }}</span>
                                         {% else %}
                                             {% if grade.grade >= 60 %}
-                                                <span class="badge bg-success">Pass</span>
+                                                <span class="badge badge-success">Pass</span>
                                             {% else %}
-                                                <span class="badge bg-danger">Fail</span>
+                                                <span class="badge badge-danger">Fail</span>
                                             {% endif %}
                                         {% endif %}
                                     </td>

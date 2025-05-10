@@ -194,14 +194,6 @@
                         <div class="info-label">Credits</div>
                         <div class="info-value">{{ course.credits }}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Status</div>
-                        <div class="info-value">
-                            <span class="course-status {% if course.is_active %}status-active{% else %}status-inactive{% endif %}">
-                                {% if course.is_active %}Active{% else %}Inactive{% endif %}
-                            </span>
-                        </div>
-                    </div>
                     {% if course.description %}
                     <div class="info-item">
                         <div class="info-label">Description</div>
@@ -237,8 +229,8 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="fas fa-user-plus mr-2"></i>Enrolled Students</h5>
-                        <a href="{% url 'student:enrollment_add' %}?course={{ course.id }}" class="btn btn-light btn-action">
-                            <i class="fas fa-plus mr-2"></i>Add Enrollment
+                        <a href="{% url 'student:course_enrollment_add' course.id %}" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Enroll Students
                         </a>
                     </div>
                 </div>
@@ -286,8 +278,8 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Grades</h5>
-                        <a href="{% url 'student:grade_add' %}?course={{ course.id }}" class="btn btn-light btn-action">
-                            <i class="fas fa-plus mr-2"></i>Add Grade
+                        <a href="{% url 'student:course_bulk_grades' course.id %}" class="btn btn-light btn-action">
+                            <i class="fas fa-plus mr-2"></i>Add Grades
                         </a>
                     </div>
                 </div>

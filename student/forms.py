@@ -104,42 +104,116 @@ class GradeForm(forms.ModelForm):
             instance.save()
         return instance
 
-class EnrollmentForm(BaseForm):
-    enrollment_date = forms.DateField(
-        widget=forms.DateInput(attrs={
-            'type': 'date',
-            'class': 'form-control',
-            'style': 'height: 45px;'
-        }),
-        initial=timezone.now
+class EnrollmentForm(forms.Form):
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.all(),
+        widget=forms.HiddenInput(),
+        required=True
+    )
+    semester = forms.ChoiceField(
+        choices=Enrollment.SEMESTER_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    students = forms.ModelMultipleChoiceField(
+        queryset=Student.objects.filter(is_active=True),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        required=True,
+        label='Select Students'
     )
 
-    class Meta:
-        model = Enrollment
-        fields = ['student', 'course', 'semester', 'enrollment_date']
-        widgets = {
-            'student': forms.Select(attrs={
-                'class': 'form-select',
-                'style': 'height: 45px;'
-            }),
-            'course': forms.Select(attrs={
-                'class': 'form-select',
-                'style': 'height: 45px;'
-            }),
-            'semester': forms.Select(attrs={
-                'class': 'form-select',
-                'style': 'height: 45px;'
-            })
-        }
+    def __init__(self, *args, **kwargs):
+        course_id = kwargs.pop('course_id', None)
+        super().__init__(*args, **kwargs)
+        
+        if course_id:
+            try:
+                course = Course.objects.get(id=course_id)
+                self.fields['course'].initial = course
+                
+                # Get active students not enrolled in this course
+                enrolled_students = Enrollment.objects.filter(
+                    course=course
+                ).values_list('student_id', flat=True)
+                
+                available_students = Student.objects.filter(
+                    is_active=True
+                ).exclude(id__in=enrolled_students)
+                
+                self.fields['students'].queryset = available_students
+                
+            except Course.DoesNotExist:
+                pass
+
+    def get_student_list(self):
+        """Return list of students for template display"""
+        return self.fields['students'].queryset
 
     def clean(self):
         cleaned_data = super().clean()
         student = cleaned_data.get('student')
-        course = cleaned_data.get('course')
+        courses = cleaned_data.get('courses')
         semester = cleaned_data.get('semester')
 
-        if student and course and semester:
-            if Enrollment.objects.filter(student=student, course=course, semester=semester).exists():
-                raise forms.ValidationError('Student is already enrolled in this course for the selected semester.')
+        if student and courses and semester:
+            # Öğrencinin seçilen dönemde zaten kayıtlı olduğu dersleri bul
+            existing_enrollments = Enrollment.objects.filter(
+                student=student,
+                semester=semester,
+                course__in=courses
+            ).values_list('course__name', flat=True)
 
-        return cleaned_data 
+            if existing_enrollments:
+                # Eğer varsa, bu dersleri courses listesinden çıkar
+                courses_to_remove = Course.objects.filter(name__in=existing_enrollments)
+                cleaned_data['courses'] = courses.exclude(id__in=courses_to_remove)
+                
+                # Kullanıcıya bilgi ver
+                if len(existing_enrollments) == 1:
+                    raise forms.ValidationError(
+                        f'Student is already enrolled in {existing_enrollments[0]} for the selected semester.'
+                    )
+                else:
+                    raise forms.ValidationError(
+                        f'Student is already enrolled in the following courses for the selected semester: {", ".join(existing_enrollments)}'
+                    )
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        enrollments = []
+        student = self.cleaned_data['student']
+        courses = self.cleaned_data['courses']
+        semester = self.cleaned_data['semester']
+        enrollment_date = self.cleaned_data['enrollment_date']
+
+        for course in courses:
+            # Son bir kontrol daha yap
+            if not Enrollment.objects.filter(student=student, course=course, semester=semester).exists():
+                enrollment = Enrollment(
+                    student=student,
+                    course=course,
+                    semester=semester,
+                    enrollment_date=enrollment_date
+                )
+                if commit:
+                    enrollment.save()
+                enrollments.append(enrollment)
+
+        return enrollments
+
+
+class BulkEnrollmentForm(forms.Form):
+    student = forms.ModelChoiceField(
+        queryset=Student.objects.filter(is_active=True),
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    courses = forms.ModelMultipleChoiceField(
+        queryset=Course.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        required=True
+    )
+    semester = forms.ChoiceField(
+        choices=Enrollment.SEMESTER_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    ) 
